@@ -122,7 +122,26 @@ mutation {
 ```graphql
 query {
   reportStatus(id: "report-uuid") {
+    id
     status
+  }
+}
+```
+
+### Get Report Result
+
+```graphql
+query {
+  report(id: "report-uuid") {
+    id
+    startedAt
+    finishedAt
+    contents {
+      id
+      source
+      status
+      data
+    }
   }
 }
 ```
@@ -130,3 +149,52 @@ query {
 ## Architecture
 
 See [PLAN.md](./PLAN.md) for detailed architecture and data flow diagrams.
+
+### Multi-Tenant Database Switching
+
+Each tenant has its own physical PostgreSQL database (lqdty_t1, lqdty_t2, lqdty_t3). The system switches databases at runtime based on the `tenantId` from the JWT token.
+
+**How it works:**
+
+1. User authenticates → JWT issued with `tenantId` in payload
+2. On each request, `@CurrentUser()` decorator extracts `tenantId` from JWT
+3. `TenantConnectionManager` maintains a connection pool (`Map<tenantId, DataSource>`)
+4. When a service needs DB access, it calls `getConnection(tenantId)`:
+   - If connection exists and is initialized → reuse it
+   - Otherwise → create new connection from `TENANCY_CONFIG` and cache it
+5. All queries execute against the tenant-specific database
+
+**Configuration:**
+
+Tenant databases are configured via the `TENANCY_CONFIG` environment variable (JSON):
+
+```json
+{
+  "tenant": {
+    "tenant-uuid-1": {"host": "localhost", "port": 5432, "database": "lqdty_t1", ...},
+    "tenant-uuid-2": {"host": "localhost", "port": 5432, "database": "lqdty_t2", ...}
+  }
+}
+```
+
+### Long-Running Report Orchestration
+
+Report generation involves calling 3 slow external APIs. To avoid holding HTTP connections open for minutes, we use an event-driven architecture:
+
+**Flow:**
+
+1. **Client** calls `startReport` mutation → returns immediately with `reportId`
+2. **API** creates `report` + 3 `report_content` rows (one per source)
+3. **Debezium** (CDC) captures INSERT on `report_contents` → publishes to Pub/Sub
+4. **CDC Worker** receives message → starts a Temporal workflow for each source
+5. **Temporal Workflow** polls external API every 10 seconds until `completed`
+6. **Temporal** updates `report_content.status` to COMPLETED
+7. **Debezium** captures UPDATE → publishes to Pub/Sub
+8. **CDC Worker** checks if all 3 sources completed → sets `report.finishedAt`
+9. **Client** polls `reportStatus` query until status is COMPLETED
+
+**Benefits:**
+- No long-held HTTP connections
+- Parallel execution of 3 provider calls
+- Automatic retries via Temporal
+- Full visibility in Temporal UI (localhost:8088)
