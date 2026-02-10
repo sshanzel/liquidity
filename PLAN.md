@@ -253,8 +253,8 @@ This worker should receive an object `reportContent` which is basically a whole 
 
 ## Completed fetching from data source (CDC)
 
-We already have the CDC for `report_content` in place, but that was for insertions. This time, when a record gets updated, we will check if the status went from `in_progress` to `completed` - if so, we will pull the relevant `report_content` entities under the same id then we will update the `report` entity’s `finishedAt` to `now()` value.
+We already have the CDC for `report_content` in place, but that was for insertions. This time, when a record gets updated, we will check if the status went from `in_progress` to `completed` - if so, we will pull the relevant `report_content` entities under the same report id then we will update the `report` entity’s `finishedAt` to `now()` value.
 
 ## Note on the CDC
 
-Our CDC will run Debezium. Whenever a change is triggered, we will send a pubsub message, for then we will have a subscription that will run the checks we mentioned above. The CDC pipeline stays dumb and just first a pubsub message. All the processing and triggering of the temporal workflow will happen on the subscription worker.
+Our CDC will run Debezium. Whenever a change is triggered, we will send a pubsub message, for then we will have a subscription that will run the checks we mentioned above. The CDC pipeline stays dumb and just fires a pubsub message. All the processing and triggering of the temporal workflow will happen on the subscription worker.
