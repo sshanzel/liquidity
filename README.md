@@ -70,13 +70,13 @@ pnpm --filter api dev
 
 ## Services
 
-| Service | URL | Port |
-|---------|-----|------|
+| Service            | URL                           | Port |
+| ------------------ | ----------------------------- | ---- |
 | GraphQL Playground | http://localhost:4000/graphql | 4000 |
-| Temporal UI | http://localhost:8088 | 8088 |
-| PostgreSQL | - | 5432 |
-| Pub/Sub Emulator | - | 8085 |
-| Temporal Server | - | 7233 |
+| Temporal UI        | http://localhost:8088         | 8088 |
+| PostgreSQL         | -                             | 5432 |
+| Pub/Sub Emulator   | -                             | 8085 |
+| Temporal Server    | -                             | 7233 |
 
 ## GraphQL Examples
 
@@ -84,31 +84,35 @@ pnpm --filter api dev
 
 **Tenants:**
 
-| Tenant ID | Database |
-|-----------|----------|
+| Tenant ID                              | Database |
+| -------------------------------------- | -------- |
 | `a1b2c3d4-e5f6-7890-abcd-ef1234567890` | lqdty_t1 |
 | `b2c3d4e5-f6a7-8901-bcde-f12345678901` | lqdty_t2 |
 | `c3d4e5f6-a7b8-9012-cdef-123456789012` | lqdty_t3 |
 
 **Users:**
 
-| Username | Password | Tenant |
-|----------|----------|--------|
-| `user1` | `password123` | lqdty_t1 |
-| `user2` | `password123` | lqdty_t2 |
-| `user3` | `password123` | lqdty_t3 |
+| Username | Password      | Tenant   |
+| -------- | ------------- | -------- |
+| `user1`  | `password123` | lqdty_t1 |
+| `user2`  | `password123` | lqdty_t2 |
+| `user3`  | `password123` | lqdty_t3 |
 
 ### Register User
 
 ```graphql
 mutation {
-  register(input: {
-    tenantId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-    username: "testuser"
-    password: "password123"
-    taxId: "123-45-6789"
-  }) {
-    user { id username }
+  register(
+    input: {
+      tenantId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      username: "testuser"
+      password: "password123"
+      taxId: "123-45-6789"
+    }
+  ) {
+    id
+    username
+    taxId
   }
 }
 ```
@@ -117,11 +121,10 @@ mutation {
 
 ```graphql
 mutation {
-  login(input: {
-    username: "user1"
-    password: "password123"
-  }) {
-    user { id username }
+  login(input: {username: "user1", password: "password123"}) {
+    id
+    username
+    taxId
   }
 }
 ```
@@ -132,7 +135,12 @@ mutation {
 mutation {
   startReport {
     id
-    status
+    startedAt
+    contents {
+      id
+      source
+      status
+    }
   }
 }
 ```
@@ -214,6 +222,7 @@ Report generation involves calling 3 slow external APIs. To avoid holding HTTP c
 9. **Client** polls `reportStatus` query until status is COMPLETED
 
 **Benefits:**
+
 - No long-held HTTP connections
 - Parallel execution of 3 provider calls
 - Automatic retries via Temporal
