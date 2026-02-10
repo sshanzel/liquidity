@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.10.0",
+    "@google-cloud/pubsub": "^5.2.2",
     "@liquidity/shared": "workspace:*",
     "@nestjs/apollo": "^12.1.0",
     "@nestjs/common": "^10.3.0",

@@ -9,6 +9,7 @@ import {TenantModule} from './tenant/tenant.module';
 import {UserModule} from './user/user.module';
 import {AuthModule} from './auth/auth.module';
 import {ReportModule} from './report/report.module';
+import {PubSubModule} from './pubsub/pubsub.module';
 
 interface GqlContext {
   req: Request;
@@ -31,6 +32,7 @@ interface GqlContext {
     UserModule,
     AuthModule,
     ReportModule,
+    PubSubModule,
   ],
 })
 export class AppModule {}
