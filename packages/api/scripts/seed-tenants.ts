@@ -1,8 +1,8 @@
 import {DataSource} from 'typeorm';
 import {config} from 'dotenv';
 import {resolve} from 'path';
+import * as bcrypt from 'bcrypt';
 
-// Load .env from packages/api
 config({path: resolve(__dirname, '../.env')});
 
 const catalogDataSource = new DataSource({
@@ -32,6 +32,27 @@ const tenants = [
   },
 ];
 
+const users = [
+  {
+    tenantId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    username: 'user1',
+    password: 'password123',
+    taxId: '111-11-1111',
+  },
+  {
+    tenantId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+    username: 'user2',
+    password: 'password123',
+    taxId: '222-22-2222',
+  },
+  {
+    tenantId: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
+    username: 'user3',
+    password: 'password123',
+    taxId: '333-33-3333',
+  },
+];
+
 async function seed() {
   await catalogDataSource.initialize();
   console.log('Connected to catalog database\n');
@@ -39,10 +60,11 @@ async function seed() {
   const queryRunner = catalogDataSource.createQueryRunner();
 
   try {
+    console.log('Seeding tenants...');
     for (const tenant of tenants) {
       const exists = await queryRunner.query(
         'SELECT id FROM tenants WHERE id = $1',
-        [tenant.id]
+        [tenant.id],
       );
 
       if (exists.length > 0) {
@@ -52,9 +74,29 @@ async function seed() {
 
       await queryRunner.query(
         'INSERT INTO tenants (id, name, description) VALUES ($1, $2, $3)',
-        [tenant.id, tenant.name, tenant.description]
+        [tenant.id, tenant.name, tenant.description],
       );
       console.log(`✓ Created tenant: ${tenant.name} (${tenant.id})`);
+    }
+
+    console.log('\nSeeding users...');
+    for (const user of users) {
+      const exists = await queryRunner.query(
+        'SELECT id FROM users WHERE username = $1',
+        [user.username],
+      );
+
+      if (exists.length > 0) {
+        console.log(`→ User "${user.username}" already exists, skipping`);
+        continue;
+      }
+
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      await queryRunner.query(
+        'INSERT INTO users ("tenantId", username, password, "taxId") VALUES ($1, $2, $3, $4)',
+        [user.tenantId, user.username, hashedPassword, user.taxId],
+      );
+      console.log(`✓ Created user: ${user.username} (tenant: ${user.tenantId.slice(0, 8)}...)`);
     }
 
     console.log('\nSeeding completed.');

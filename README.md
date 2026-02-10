@@ -78,6 +78,24 @@ pnpm --filter api dev
 
 ## GraphQL Examples
 
+### Seeded Test Data
+
+**Tenants:**
+
+| Tenant ID | Database |
+|-----------|----------|
+| `a1b2c3d4-e5f6-7890-abcd-ef1234567890` | lqdty_t1 |
+| `b2c3d4e5-f6a7-8901-bcde-f12345678901` | lqdty_t2 |
+| `c3d4e5f6-a7b8-9012-cdef-123456789012` | lqdty_t3 |
+
+**Users:**
+
+| Username | Password | Tenant |
+|----------|----------|--------|
+| `user1` | `password123` | lqdty_t1 |
+| `user2` | `password123` | lqdty_t2 |
+| `user3` | `password123` | lqdty_t3 |
+
 ### Register User
 
 ```graphql
@@ -98,7 +116,7 @@ mutation {
 ```graphql
 mutation {
   login(input: {
-    username: "testuser"
+    username: "user1"
     password: "password123"
   }) {
     user { id username }
