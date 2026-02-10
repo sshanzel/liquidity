@@ -25,16 +25,23 @@ const SOURCE_ENDPOINTS: Record<ReportSource, string> = {
 @Injectable()
 export class ReportActivitiesService {
   private readonly logger = new Logger(ReportActivitiesService.name);
+  private attemptCounts = new Map<string, number>();
 
   constructor(private tenantConnectionManager: TenantConnectionManager) {}
 
   async fetchFromSource(input: FetchSourceInput): Promise<FetchSourceResult> {
     const endpoint = SOURCE_ENDPOINTS[input.source];
-    this.logger.log(`Fetching from ${input.source} (${endpoint})`);
+    const attempt = (this.attemptCounts.get(input.reportContentId) || 0) + 1;
+    this.attemptCounts.set(input.reportContentId, attempt);
+
+    this.logger.log(`Fetching from ${input.source} (${endpoint}) - attempt ${attempt}`);
+
+    // just to simulate different statuses based on attempt count and randomness
+    const status = attempt <= 3 ? 'in_progress' : Math.random() > 0.5 ? 'completed' : 'in_progress';
 
     const result: FetchSourceResult = {
       id: input.reportContentId,
-      status: Math.random() > 0.5 ? 'completed' : 'in_progress',
+      status,
     };
 
     this.logger.log(`Source ${input.source} returned status: ${result.status}`);
@@ -43,6 +50,7 @@ export class ReportActivitiesService {
 
   async updateReportContent(tenantId: string, reportContentId: string): Promise<void> {
     this.logger.log(`Updating report content ${reportContentId}`);
+    this.attemptCounts.delete(reportContentId);
 
     const connection = await this.tenantConnectionManager.getConnection(tenantId);
     const contentRepo = connection.getRepository(ReportContent);
