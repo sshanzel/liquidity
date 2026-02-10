@@ -34,7 +34,11 @@ export class PubSubPublisher {
     const [exists] = await topic.exists();
 
     if (!exists) {
-      await topic.create();
+      try {
+        await topic.create();
+      } catch (error: any) {
+        if (error.code !== 6) throw error;
+      }
     }
 
     this.topics.set(topicName, topic);

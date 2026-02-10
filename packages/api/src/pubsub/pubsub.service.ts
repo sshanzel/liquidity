@@ -54,7 +54,11 @@ export class PubSubService implements OnModuleInit, OnModuleDestroy {
     const subscription = topic.subscription(subscriptionName);
     const [exists] = await subscription.exists();
     if (!exists) {
-      await subscription.create();
+      try {
+        await subscription.create();
+      } catch (error: any) {
+        if (error.code !== 6) throw error;
+      }
     }
 
     this.subscriptions.set(key, subscription);
