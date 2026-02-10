@@ -12,9 +12,9 @@ Multi-tenant report generation system with event-driven architecture.
 
 ## Prerequisites
 
-- [nvm](https://github.com/nvm-sh/nvm) (recommended)
-- pnpm
-- Docker & Docker Compose
+- [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) - Node version manager
+- [pnpm](https://pnpm.io/installation) - Package manager
+- [Docker](https://docs.docker.com/get-docker/) - Container runtime
 
 ## Getting Started
 
