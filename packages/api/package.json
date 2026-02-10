@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.10.0",
+    "@apollo/server-plugin-landing-page-graphql-playground": "^4.0.1",
     "@google-cloud/pubsub": "^5.2.2",
     "@liquidity/shared": "workspace:*",
     "@nestjs/apollo": "^12.1.0",
@@ -51,12 +52,12 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.0",
-    "nodemon": "^3.1.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
     "@types/node": "^20.11.0",
     "@types/passport-jwt": "^4.0.1",
+    "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
