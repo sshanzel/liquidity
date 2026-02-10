@@ -9,7 +9,7 @@
   - Use JWT for auth. Payload must include the `tenantId` for other purposes.
   - A user model must include `taxId` property.
 - Tenancy: there will be 3 tenants.
-  - Each will have its own physical DB: tenant1, tenant2, and tenant3.
+  - Each will have its own physical DB: lqdty_t1, lqdty_t2, and lqdty_t3.
   - Switching of DB must be possible on runtime based on tenantId.
   - DB connections must be reused.
   - Config can be at: a single env variable containing a JSON tenant registry (e.g., TENANTS_CONFIG).
@@ -23,7 +23,7 @@
 
 # Packages/tech/library to use
 
-- Validation: Zod.
+- Validation: class-validator.
 - Background events: pubsub.
 - Data migration (CDC): Debezium.
 - Worker/poller: Temporal (delayed runner).
@@ -215,7 +215,7 @@ When this is triggered, it should do the following:
 - Create a report id and store it in the reports table.
   - The persistent data must include the user id and tenant id from the JWT payload.
   - Create rows in the `report_content` table depending on the number of sources we will need to generate the report itself.
-    - For now, we will have a static array containing three elements: `['data_source1', 'data_source2', 'data_source'3]`
+    - For now, we will have a static array containing three elements: `['source_1', 'source_2', 'source_3']`
     - We will use these references to understand where to pull the data.
 - Return the report id.
 
