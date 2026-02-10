@@ -31,7 +31,82 @@
 
 # High-level overview
 
-TBD: add details here
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENT                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         GRAPHQL API (NestJS)                                │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │   Auth      │  │   Report    │  │   User      │  │   Tenant            │ │
+│  │   Module    │  │   Module    │  │   Module    │  │   Module            │ │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+            ┌───────────┐   ┌───────────┐   ┌───────────┐
+            │ Catalog   │   │ Tenant 1  │   │ Tenant 2  │   ... (N tenants)
+            │ Database  │   │ Database  │   │ Database  │
+            │           │   │           │   │           │
+            │ - Tenant  │   │ - Report  │   │ - Report  │
+            │ - User    │   │ - Content │   │ - Content │
+            └───────────┘   └─────┬─────┘   └───────────┘
+                                  │
+                                  │ CDC (Debezium)
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            DEBEZIUM SERVER                                  │
+│         Monitors: report_contents table (INSERT/UPDATE)                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         GOOGLE CLOUD PUB/SUB                                │
+│                         Topic: tenant-cdc                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          CDC WORKER (NestJS)                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ ReportContentCdcHandler                                             │    │
+│  │  - onInsert: Start Temporal workflow                                │    │
+│  │  - onUpdate: Check if all sources completed → mark report finished  │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              TEMPORAL                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ fetchReportContentWorkflow                                          │    │
+│  │  1. Poll external source API                                        │    │
+│  │  2. If in_progress → sleep 10s → retry                              │    │
+│  │  3. If completed → update report_content status                     │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+                        ┌─────────────────┐
+                        │ External Source │
+                        │ APIs (3 sources)│
+                        └─────────────────┘
+```
+
+## Data Flow Summary
+
+1. **Client** calls `startReport` mutation
+2. **API** creates `report` + 3 `report_content` rows (one per source)
+3. **Debezium** captures INSERT on `report_contents` → publishes to Pub/Sub
+4. **CDC Worker** receives message → starts Temporal workflow for each source
+5. **Temporal** polls external API until status is `completed`
+6. **Temporal** updates `report_content.status` to `COMPLETED`
+7. **Debezium** captures UPDATE → publishes to Pub/Sub
+8. **CDC Worker** checks if all 3 sources completed → marks `report.finishedAt`
+9. **Client** polls `reportStatus` query until complete
 
 # Catalog (master) Database Structure
 
