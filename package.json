@@ -1,0 +1,13 @@
+{
+  "name": "liquidity",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @liquidity/api dev",
+    "build": "pnpm -r build",
+    "start": "pnpm --filter @liquidity/api start"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
