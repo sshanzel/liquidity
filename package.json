@@ -5,9 +5,14 @@
   "scripts": {
     "dev": "pnpm --filter @liquidity/api dev",
     "build": "pnpm -r build",
-    "start": "pnpm --filter @liquidity/api start"
+    "start": "pnpm --filter @liquidity/api start",
+    "format": "prettier --write \"packages/**/*.{ts,tsx,js,json}\"",
+    "format:check": "prettier --check \"packages/**/*.{ts,tsx,js,json}\""
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1"
   }
 }
