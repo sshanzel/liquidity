@@ -2,6 +2,7 @@ import {Module} from '@nestjs/common';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {TenantConnectionManager} from './tenant-connection.manager';
+import {TenantMapper} from './tenant-mapper.service';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import {TenantConnectionManager} from './tenant-connection.manager';
       }),
     }),
   ],
-  providers: [TenantConnectionManager],
-  exports: [TenantConnectionManager],
+  providers: [TenantConnectionManager, TenantMapper],
+  exports: [TenantConnectionManager, TenantMapper],
 })
 export class DbModule {}

@@ -2,12 +2,25 @@ import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
 import {Message} from '@google-cloud/pubsub';
 import {PubSubService} from '../pubsub.service';
 import {PUBSUB_SUBSCRIPTIONS} from '../pubsub.constants';
+import {DebeziumMessage, BaseCdcHandler} from './cdc.types';
+import {ReportContentCdcHandler} from './handlers/report-content-cdc.handler';
 
 @Injectable()
 export class TenantCdcWorker implements OnModuleInit {
   private readonly logger = new Logger(TenantCdcWorker.name);
+  private handlers = new Map<string, BaseCdcHandler<unknown>>();
 
-  constructor(private pubSubService: PubSubService) {}
+  constructor(
+    private pubSubService: PubSubService,
+    private reportContentCdcHandler: ReportContentCdcHandler,
+  ) {
+    this.registerHandler(this.reportContentCdcHandler);
+  }
+
+  private registerHandler(handler: BaseCdcHandler<unknown>): void {
+    this.handlers.set(handler.table, handler);
+    this.logger.log(`Registered CDC handler for table: ${handler.table}`);
+  }
 
   async onModuleInit() {
     const sub = PUBSUB_SUBSCRIPTIONS.TENANT_CDC_WORKER;
@@ -16,7 +29,14 @@ export class TenantCdcWorker implements OnModuleInit {
   }
 
   private async handleMessage(message: Message): Promise<void> {
-    const data = JSON.parse(message.data.toString());
-    this.logger.log(`Received message: ${JSON.stringify(data)}`);
+    const data = JSON.parse(message.data.toString()) as DebeziumMessage;
+    this.logger.log(`CDC event: ${data.op} on ${data.source.table} (${data.source.db})`);
+
+    const handler = this.handlers.get(data.source.table);
+    if (!handler) {
+      return;
+    }
+
+    await handler.handle(data);
   }
 }
