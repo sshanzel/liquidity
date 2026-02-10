@@ -2,6 +2,85 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type ReportContent {
+  id: ID!
+  reportId: String!
+  source: String!
+  status: ReportStatus!
+  data: String
+  createdAt: DateTime!
+  lastRunAt: DateTime!
+}
+
+enum ReportStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Report {
+  id: ID!
+  tenantId: String!
+  userId: String!
+  startedAt: DateTime!
+  finishedAt: DateTime
+  contents: [ReportContent!]!
+}
+
+type User {
+  id: ID!
+  tenantId: String!
+  tenant: Tenant!
+  username: String!
+  taxId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Tenant {
+  id: ID!
+  name: String!
+  description: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ReportStatusResponse {
+  id: ID!
+  status: ReportStatusEnum!
+}
+
+enum ReportStatusEnum {
+  IN_PROGRESS
+  COMPLETED
+}
+
 type Query {
-  hello: String!
+  me: User!
+  reportStatus(id: ID!): ReportStatusResponse
+  report(id: ID!): Report
+  myReports: [Report!]!
+}
+
+type Mutation {
+  register(input: RegisterInput!): User!
+  login(input: LoginInput!): User!
+  logout: Boolean!
+  startReport: Report!
+}
+
+input RegisterInput {
+  tenantId: ID!
+  username: String!
+  password: String!
+  taxId: String!
+}
+
+input LoginInput {
+  username: String!
+  password: String!
 }
