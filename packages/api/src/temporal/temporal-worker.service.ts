@@ -45,6 +45,10 @@ export class TemporalWorkerService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    await this.worker?.shutdown();
+    try {
+      await this.worker?.shutdown();
+    } catch (err) {
+      // Ignore if already draining/stopped
+    }
   }
 }
