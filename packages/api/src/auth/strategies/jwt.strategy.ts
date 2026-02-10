@@ -4,13 +4,9 @@ import {PassportStrategy} from '@nestjs/passport';
 import {Request} from 'express';
 import {Strategy} from 'passport-jwt';
 import {UserService} from '../../user/user.service';
+import {JwtPayload} from '../auth.service';
 
 export const AUTH_COOKIE_NAME = 'access_token';
-
-interface JwtPayload {
-  sub: string;
-  email: string;
-}
 
 function extractFromCookie(req: Request): string | null {
   return req.cookies?.[AUTH_COOKIE_NAME] ?? null;

@@ -5,6 +5,7 @@ import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
 import {Request, Response} from 'express';
 import {join} from 'path';
 import {DatabaseModule} from './database/database.module';
+import {TenantModule} from './tenant/tenant.module';
 import {UserModule} from './user/user.module';
 import {AuthModule} from './auth/auth.module';
 
@@ -23,6 +24,7 @@ interface GqlContext {
       playground: true,
       context: ({req, res}: GqlContext) => ({req, res}),
     }),
+    TenantModule,
     UserModule,
     AuthModule,
   ],
