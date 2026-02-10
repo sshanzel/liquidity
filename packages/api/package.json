@@ -7,7 +7,7 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "typeorm": "typeorm-ts-node-commonjs -d src/database/data-source.ts",
-    "migration:generate": "pnpm typeorm migration:generate src/database/migrations/$npm_config_name",
+    "migration:generate": "pnpm typeorm migration:generate",
     "migration:run": "pnpm typeorm migration:run",
     "migration:revert": "pnpm typeorm migration:revert"
   },
@@ -19,6 +19,7 @@
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^10.3.0",
     "@nestjs/graphql": "^12.1.0",
+    "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.3.0",
     "@nestjs/typeorm": "^11.0.0",
     "dotenv": "^17.2.4",
