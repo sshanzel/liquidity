@@ -2,10 +2,16 @@ import {Module} from '@nestjs/common';
 import {ConfigModule} from '@nestjs/config';
 import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
+import {Request, Response} from 'express';
 import {join} from 'path';
-import {AppResolver} from './app.resolver';
 import {DatabaseModule} from './database/database.module';
 import {UserModule} from './user/user.module';
+import {AuthModule} from './auth/auth.module';
+
+interface GqlContext {
+  req: Request;
+  res: Response;
+}
 
 @Module({
   imports: [
@@ -15,9 +21,10 @@ import {UserModule} from './user/user.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'schema.gql'),
       playground: true,
+      context: ({req, res}: GqlContext) => ({req, res}),
     }),
     UserModule,
+    AuthModule,
   ],
-  providers: [AppResolver],
 })
 export class AppModule {}

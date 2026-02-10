@@ -1,0 +1,11 @@
+{
+  "folders": [
+    {"path": ".", "name": "root"},
+    {"path": "packages/api", "name": "api"},
+    {"path": "packages/shared", "name": "shared"},
+  ],
+  "settings": {
+    "typescript.tsdk": "root/node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+  },
+}
