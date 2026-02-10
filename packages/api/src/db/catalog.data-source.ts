@@ -1,7 +1,9 @@
 import {DataSource} from 'typeorm';
 import {config} from 'dotenv';
+import {resolve} from 'path';
 
-config();
+// Load .env from monorepo root
+config({path: resolve(__dirname, '../../../.env')});
 
 export default new DataSource({
   type: 'postgres',

@@ -15,7 +15,8 @@
     "migration:tenant:run": "pnpm typeorm:tenant migration:run",
     "migration:tenant:revert": "pnpm typeorm:tenant migration:revert",
     "migration:tenant:run:all": "ts-node scripts/migrate-tenants.ts run",
-    "migration:tenant:revert:all": "ts-node scripts/migrate-tenants.ts revert"
+    "migration:tenant:revert:all": "ts-node scripts/migrate-tenants.ts revert",
+    "seed:tenants": "ts-node scripts/seed-tenants.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.10.0",
