@@ -25,18 +25,11 @@ nvm install
 nvm use
 ```
 
-### 2. Start Infrastructure
+### 2. Start Core Infrastructure
 
 ```bash
-docker compose up -d
+docker compose up -d postgres pubsub temporal temporal-ui
 ```
-
-This starts:
-- PostgreSQL (port 5432)
-- Pub/Sub emulator (port 8085)
-- Debezium instances (3x, one per tenant)
-- Temporal server (port 7233)
-- Temporal UI (port 8088)
 
 ### 3. Install Dependencies
 
@@ -47,7 +40,7 @@ pnpm install
 ### 4. Set Up Environment
 
 ```bash
-cp .env.example packages/api/.env
+cp packages/api/.env.example packages/api/.env
 ```
 
 ### 5. Run Migrations
@@ -63,7 +56,13 @@ pnpm --filter api migration:tenant:run:all
 pnpm --filter api seed:tenants
 ```
 
-### 7. Start the API
+### 7. Start Debezium (CDC)
+
+```bash
+docker compose up -d debezium-t1 debezium-t2 debezium-t3
+```
+
+### 8. Start the API
 
 ```bash
 pnpm --filter api dev
@@ -71,10 +70,13 @@ pnpm --filter api dev
 
 ## Services
 
-| Service | URL |
-|---------|-----|
-| GraphQL Playground | http://localhost:3000/graphql |
-| Temporal UI | http://localhost:8088 |
+| Service | URL | Port |
+|---------|-----|------|
+| GraphQL Playground | http://localhost:3000/graphql | 3000 |
+| Temporal UI | http://localhost:8088 | 8088 |
+| PostgreSQL | - | 5432 |
+| Pub/Sub Emulator | - | 8085 |
+| Temporal Server | - | 7233 |
 
 ## GraphQL Examples
 
