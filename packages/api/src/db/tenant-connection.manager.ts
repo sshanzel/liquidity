@@ -4,11 +4,15 @@ import {DataSource} from 'typeorm';
 import {Report} from './tenant/entities/report.entity';
 import {ReportContent} from './tenant/entities/report-content.entity';
 
-interface TenantConfig {
-  connection: string;
+export interface TenantConfig {
+  host: string;
+  port: number;
+  database: string;
+  user: string;
+  password: string;
 }
 
-interface TenancyConfig {
+export interface TenancyConfig {
   tenant: {
     [tenantId: string]: TenantConfig;
   };
@@ -24,20 +28,33 @@ export class TenantConnectionManager implements OnModuleDestroy {
     this.tenancyConfig = JSON.parse(configJson);
   }
 
+  getConfig(tenantId: string): TenantConfig {
+    const tenantConfig = this.tenancyConfig.tenant[tenantId];
+    if (!tenantConfig) {
+      throw new Error(`No config found for tenant: ${tenantId}`);
+    }
+    return tenantConfig;
+  }
+
+  buildConnectionString(config: TenantConfig): string {
+    return `postgres://${config.user}:${config.password}@${config.host}:${config.port}/${config.database}`;
+  }
+
   async getConnection(tenantId: string): Promise<DataSource> {
     const existing = this.connections.get(tenantId);
     if (existing?.isInitialized) {
       return existing;
     }
 
-    const tenantConfig = this.tenancyConfig.tenant[tenantId];
-    if (!tenantConfig) {
-      throw new Error(`No connection config found for tenant: ${tenantId}`);
-    }
+    const tenantConfig = this.getConfig(tenantId);
 
     const dataSource = new DataSource({
       type: 'postgres',
-      url: tenantConfig.connection,
+      host: tenantConfig.host,
+      port: tenantConfig.port,
+      database: tenantConfig.database,
+      username: tenantConfig.user,
+      password: tenantConfig.password,
       entities: [Report, ReportContent],
       synchronize: false,
     });

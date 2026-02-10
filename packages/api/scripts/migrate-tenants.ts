@@ -6,13 +6,21 @@ import {resolve} from 'path';
 config({path: resolve(__dirname, '../.env')});
 
 interface TenantConfig {
-  connection: string;
+  host: string;
+  port: number;
+  database: string;
+  user: string;
+  password: string;
 }
 
 interface TenancyConfig {
   tenant: {
     [tenantId: string]: TenantConfig;
   };
+}
+
+function buildConnectionString(cfg: TenantConfig): string {
+  return `postgres://${cfg.user}:${cfg.password}@${cfg.host}:${cfg.port}/${cfg.database}`;
 }
 
 const configJson = process.env.TENANCY_CONFIG;
@@ -35,9 +43,10 @@ console.log(`Running migration:${action} on ${Object.keys(tenants).length} tenan
 for (const [tenantId, tenantConfig] of Object.entries(tenants)) {
   console.log(`→ Migrating tenant: ${tenantId}`);
   try {
+    const connectionString = buildConnectionString(tenantConfig);
     execSync(`pnpm migration:tenant:${action}`, {
       stdio: 'inherit',
-      env: {...process.env, TENANT_CONNECTION_STRING: tenantConfig.connection},
+      env: {...process.env, TENANT_CONNECTION_STRING: connectionString},
     });
     console.log(`✓ Tenant ${tenantId} completed\n`);
   } catch (error) {

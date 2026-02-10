@@ -3,6 +3,14 @@ services:
     image: postgres:16-alpine
     container_name: liquidity_postgres
     restart: unless-stopped
+    command:
+      - postgres
+      - -c
+      - wal_level=logical
+      - -c
+      - max_replication_slots=4
+      - -c
+      - max_wal_senders=4
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-liquidity}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-liquidity}
@@ -25,5 +33,56 @@ services:
     ports:
       - "8085:8085"
 
+  debezium-t1:
+    image: debezium/server:2.5
+    container_name: liquidity_debezium_t1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pubsub:
+        condition: service_started
+    environment:
+      PUBSUB_EMULATOR_HOST: pubsub:8085
+      TENANT_ID: tenant-1
+      TENANT_DB: lqdty_t1
+    volumes:
+      - ./docker/debezium:/debezium/conf:ro
+      - debezium_t1_data:/debezium/data
+
+  debezium-t2:
+    image: debezium/server:2.5
+    container_name: liquidity_debezium_t2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pubsub:
+        condition: service_started
+    environment:
+      PUBSUB_EMULATOR_HOST: pubsub:8085
+      TENANT_ID: tenant-2
+      TENANT_DB: lqdty_t2
+    volumes:
+      - ./docker/debezium:/debezium/conf:ro
+      - debezium_t2_data:/debezium/data
+
+  debezium-t3:
+    image: debezium/server:2.5
+    container_name: liquidity_debezium_t3
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pubsub:
+        condition: service_started
+    environment:
+      PUBSUB_EMULATOR_HOST: pubsub:8085
+      TENANT_ID: tenant-3
+      TENANT_DB: lqdty_t3
+    volumes:
+      - ./docker/debezium:/debezium/conf:ro
+      - debezium_t3_data:/debezium/data
+
 volumes:
   postgres_data:
+  debezium_t1_data:
+  debezium_t2_data:
+  debezium_t3_data:
