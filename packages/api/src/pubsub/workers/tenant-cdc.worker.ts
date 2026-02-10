@@ -29,7 +29,14 @@ export class TenantCdcWorker implements OnModuleInit {
   }
 
   private async handleMessage(message: Message): Promise<void> {
-    const data = JSON.parse(message.data.toString()) as DebeziumMessage;
+    const raw = JSON.parse(message.data.toString());
+    const data = (raw.payload ?? raw) as DebeziumMessage;
+
+    if (!data.source) {
+      this.logger.warn(`Invalid CDC message, no source field`);
+      return;
+    }
+
     this.logger.log(`CDC event: ${data.op} on ${data.source.table} (${data.source.db})`);
 
     const handler = this.handlers.get(data.source.table);

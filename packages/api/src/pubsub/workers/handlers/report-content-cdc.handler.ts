@@ -2,6 +2,8 @@ import {Injectable, Logger} from '@nestjs/common';
 import {BaseCdcHandler} from '../cdc.types';
 import {TenantConnectionManager} from '../../../db/tenant-connection.manager';
 import {TenantMapper} from '../../../db/tenant-mapper.service';
+import {TemporalClientService} from '../../../temporal/temporal-client.service';
+import {TEMPORAL_TASK_QUEUE} from '../../../temporal/temporal.constants';
 import {Report} from '../../../db/tenant/entities/report.entity';
 import {ReportContent, ReportStatus} from '../../../db/tenant/entities/report-content.entity';
 
@@ -23,14 +25,32 @@ export class ReportContentCdcHandler extends BaseCdcHandler<ReportContentData> {
   constructor(
     private tenantConnectionManager: TenantConnectionManager,
     private tenantMapper: TenantMapper,
+    private temporalClient: TemporalClientService,
   ) {
     super();
   }
 
-  protected async onInsert(data: ReportContentData, _database: string): Promise<void> {
+  protected async onInsert(data: ReportContentData, database: string): Promise<void> {
+    const tenantId = this.tenantMapper.getTenantIdByDatabase(database);
+    if (!tenantId) {
+      this.logger.warn(`Unknown database: ${database}`);
+      return;
+    }
+
     this.logger.log(`New report_content: ${data.id}, source: ${data.source}`);
 
-    // TODO: Trigger Temporal workflow to fetch from data source
+    await this.temporalClient.client.workflow.start('fetchReportContentWorkflow', {
+      taskQueue: TEMPORAL_TASK_QUEUE,
+      workflowId: `fetch-${data.id}`,
+      args: [{
+        tenantId,
+        reportId: data.reportId,
+        reportContentId: data.id,
+        source: data.source,
+      }],
+    });
+
+    this.logger.log(`Started workflow for report_content: ${data.id}`);
   }
 
   protected async onUpdate(

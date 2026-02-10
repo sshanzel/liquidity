@@ -11,6 +11,7 @@ import {UserModule} from './user/user.module';
 import {AuthModule} from './auth/auth.module';
 import {ReportModule} from './report/report.module';
 import {PubSubModule} from './pubsub/pubsub.module';
+import {TemporalModule} from './temporal/temporal.module';
 
 interface GqlContext {
   req: Request;
@@ -35,6 +36,7 @@ interface GqlContext {
     AuthModule,
     ReportModule,
     PubSubModule,
+    TemporalModule,
   ],
 })
 export class AppModule {}
