@@ -4,7 +4,7 @@ import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
 import {Request, Response} from 'express';
 import {join} from 'path';
-import {DatabaseModule} from './database/database.module';
+import {DbModule} from './db/db.module';
 import {TenantModule} from './tenant/tenant.module';
 import {UserModule} from './user/user.module';
 import {AuthModule} from './auth/auth.module';
@@ -17,7 +17,7 @@ interface GqlContext {
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
-    DatabaseModule,
+    DbModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'schema.gql'),

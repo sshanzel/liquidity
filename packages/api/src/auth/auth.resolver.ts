@@ -6,7 +6,7 @@ import {LoginInput} from './dto/login.input';
 import {RegisterInput} from './dto/register.input';
 import {GqlAuthGuard} from './guards/gql-auth.guard';
 import {CurrentUser} from './decorators/current-user.decorator';
-import {User} from '../user/entities/user.entity';
+import {User} from '../db/catalog/entities/user.entity';
 import {AUTH_COOKIE_NAME} from './strategies/jwt.strategy';
 
 interface GqlContext {

@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import {Module} from '@nestjs/common';
+import {ConfigModule, ConfigService} from '@nestjs/config';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {TenantConnectionManager} from './tenant-connection.manager';
 
 @Module({
   imports: [
@@ -19,5 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       }),
     }),
   ],
+  providers: [TenantConnectionManager],
+  exports: [TenantConnectionManager],
 })
-export class DatabaseModule {}
+export class DbModule {}

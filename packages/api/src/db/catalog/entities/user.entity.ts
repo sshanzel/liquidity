@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import {Tenant} from '../../tenant/entities/tenant.entity';
+import {Tenant} from './tenant.entity';
 
 @Entity('users')
 @ObjectType()
