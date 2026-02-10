@@ -2,8 +2,8 @@ import {DataSource} from 'typeorm';
 import {config} from 'dotenv';
 import {resolve} from 'path';
 
-// Load .env from monorepo root
-config({path: resolve(__dirname, '../../../.env')});
+// Load .env from packages/api
+config({path: resolve(__dirname, '../../.env')});
 
 // For migrations: pass TENANT_CONNECTION_STRING env var
 // Example: TENANT_CONNECTION_STRING=postgres://user:pass@localhost:5432/lqdty_t1

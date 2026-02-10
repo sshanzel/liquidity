@@ -2,8 +2,8 @@ import {execSync} from 'child_process';
 import {config} from 'dotenv';
 import {resolve} from 'path';
 
-// Load .env from monorepo root
-config({path: resolve(__dirname, '../../../.env')});
+// Load .env from packages/api
+config({path: resolve(__dirname, '../.env')});
 
 interface TenantConfig {
   connection: string;
