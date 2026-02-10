@@ -72,7 +72,7 @@ pnpm --filter api dev
 
 | Service | URL | Port |
 |---------|-----|------|
-| GraphQL Playground | http://localhost:3000/graphql | 3000 |
+| GraphQL Playground | http://localhost:4000/graphql | 4000 |
 | Temporal UI | http://localhost:8088 | 8088 |
 | PostgreSQL | - | 5432 |
 | Pub/Sub Emulator | - | 8085 |
