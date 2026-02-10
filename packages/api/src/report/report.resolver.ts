@@ -22,7 +22,7 @@ export class ReportResolver {
     @CurrentUser() user: User,
     @Args('id', {type: () => ID}) id: string,
   ): Promise<ReportStatusResponse | null> {
-    return this.reportService.getReportStatus(user.tenantId, id);
+    return this.reportService.getReportStatus(user.tenantId, user.id, id);
   }
 
   @Query(() => Report, {nullable: true})
@@ -30,7 +30,7 @@ export class ReportResolver {
     @CurrentUser() user: User,
     @Args('id', {type: () => ID}) id: string,
   ): Promise<Report | null> {
-    return this.reportService.getReport(user.tenantId, id);
+    return this.reportService.getReport(user.tenantId, user.id, id);
   }
 
   @Query(() => [Report])

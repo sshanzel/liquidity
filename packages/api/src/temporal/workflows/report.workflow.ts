@@ -27,7 +27,7 @@ export async function fetchReportContentWorkflow(input: FetchReportContentInput)
     });
 
     if (result.status === 'completed') {
-      await updateReportContent(input.tenantId, input.reportContentId);
+      await updateReportContent(input.tenantId, input.reportContentId, input.source);
       break;
     }
 

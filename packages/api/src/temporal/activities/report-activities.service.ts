@@ -48,7 +48,7 @@ export class ReportActivitiesService {
     return result;
   }
 
-  async updateReportContent(tenantId: string, reportContentId: string): Promise<void> {
+  async updateReportContent(tenantId: string, reportContentId: string, source: string): Promise<void> {
     this.logger.log(`Updating report content ${reportContentId}`);
     this.attemptCounts.delete(reportContentId);
 
@@ -60,9 +60,24 @@ export class ReportActivitiesService {
       {
         status: ReportStatus.COMPLETED,
         lastRunAt: new Date(),
+        data: this.generateReportData(source),
       },
     );
 
     this.logger.log(`Report content ${reportContentId} updated to COMPLETED`);
+  }
+
+  private generateReportData(source: string): string {
+    const data = {
+      source,
+      generatedAt: new Date().toISOString(),
+      metrics: {
+        totalRecords: Math.floor(Math.random() * 10000) + 1000,
+        processedAt: new Date().toISOString(),
+        accuracy: (Math.random() * 5 + 95).toFixed(2) + '%',
+      },
+      summary: `Report data from ${source}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.`,
+    };
+    return JSON.stringify(data, null, 2);
   }
 }

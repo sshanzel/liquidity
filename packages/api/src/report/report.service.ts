@@ -35,13 +35,14 @@ export class ReportService {
 
   async getReportStatus(
     tenantId: string,
+    userId: string,
     reportId: string,
   ): Promise<ReportStatusResponse | null> {
     const connection = await this.tenantConnectionManager.getConnection(tenantId);
     const reportRepo = connection.getRepository(Report);
 
     const report = await reportRepo.findOne({
-      where: {id: reportId},
+      where: {id: reportId, userId},
       select: ['id', 'finishedAt'],
     });
 
@@ -55,12 +56,12 @@ export class ReportService {
     };
   }
 
-  async getReport(tenantId: string, reportId: string): Promise<Report | null> {
+  async getReport(tenantId: string, userId: string, reportId: string): Promise<Report | null> {
     const connection = await this.tenantConnectionManager.getConnection(tenantId);
     const reportRepo = connection.getRepository(Report);
 
     return reportRepo.findOne({
-      where: {id: reportId},
+      where: {id: reportId, userId},
       relations: ['contents'],
     });
   }

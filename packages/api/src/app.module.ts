@@ -73,10 +73,30 @@ interface GqlContext {
             {
               name: 'Report Status',
               endpoint: '/graphql',
-              query: `query ReportStatus($id: String!) {
+              query: `query ReportStatus($id: ID!) {
   reportStatus(id: $id) {
     id
     status
+  }
+}`,
+              variables: '{\n  "id": "PASTE_REPORT_ID_HERE"\n}',
+            },
+            {
+              name: 'Get Report',
+              endpoint: '/graphql',
+              query: `query GetReport($id: ID!) {
+  report(id: $id) {
+    id
+    userId
+    tenantId
+    startedAt
+    finishedAt
+    contents {
+      id
+      source
+      status
+      data
+    }
   }
 }`,
               variables: '{\n  "id": "PASTE_REPORT_ID_HERE"\n}',
