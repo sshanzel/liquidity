@@ -6,10 +6,15 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main.js",
-    "typeorm": "typeorm-ts-node-commonjs -d src/database/data-source.ts",
-    "migration:generate": "pnpm typeorm migration:generate",
-    "migration:run": "pnpm typeorm migration:run",
-    "migration:revert": "pnpm typeorm migration:revert"
+    "typeorm:catalog": "typeorm-ts-node-commonjs -d src/database/catalog.data-source.ts",
+    "typeorm:tenant": "typeorm-ts-node-commonjs -d src/database/tenant.data-source.ts",
+    "migration:catalog:generate": "pnpm typeorm:catalog migration:generate",
+    "migration:catalog:run": "pnpm typeorm:catalog migration:run",
+    "migration:catalog:revert": "pnpm typeorm:catalog migration:revert",
+    "migration:tenant:generate": "pnpm typeorm:tenant migration:generate",
+    "migration:tenant:run": "pnpm typeorm:tenant migration:run",
+    "migration:tenant:revert": "pnpm typeorm:tenant migration:revert",
+    "migration:tenant:run:all": "TENANT_DB=lqdty_t1 pnpm migration:tenant:run && TENANT_DB=lqdty_t2 pnpm migration:tenant:run && TENANT_DB=lqdty_t3 pnpm migration:tenant:run"
   },
   "dependencies": {
     "@apollo/server": "^4.10.0",
