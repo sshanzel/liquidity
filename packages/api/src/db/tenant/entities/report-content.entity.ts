@@ -28,7 +28,7 @@ export class ReportContent {
   @Field()
   reportId: string;
 
-  @ManyToOne(() => Report, report => report.contents)
+  @ManyToOne(() => Report, report => report.contents, {onDelete: 'CASCADE'})
   @JoinColumn({name: 'reportId'})
   report: Report;
 
