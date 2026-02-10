@@ -2,7 +2,6 @@ import {Module} from '@nestjs/common';
 import {ConfigModule} from '@nestjs/config';
 import {GraphQLModule} from '@nestjs/graphql';
 import {ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
-import {ApolloServerPluginLandingPageGraphQLPlayground} from '@apollo/server-plugin-landing-page-graphql-playground';
 import {Request, Response} from 'express';
 import {join} from 'path';
 import {DbModule} from './db/db.module';
@@ -27,8 +26,7 @@ interface GqlContext {
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'schema.gql'),
-      playground: false,
-      plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+      playground: true,
       context: ({req, res}: GqlContext) => ({req, res}),
     }),
     TenantModule,

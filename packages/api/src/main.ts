@@ -9,6 +9,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true}));
+
+  app.enableShutdownHooks();
+
   await app.listen(PORT);
   console.log(`Server running at http://localhost:${PORT}/graphql`);
 }
