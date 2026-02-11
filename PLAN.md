@@ -190,7 +190,6 @@ Should require the following parameters:
 This will return an object containing the follow properties:
 
 - User (user entity)
-- Token
 
 ### Token
 
@@ -206,7 +205,6 @@ Should require the following parameters:
 This will return an object containing the follow properties:
 
 - User (user entity)
-- Token (same kind of token from registration)
 
 ## Mutation Start Report Generation
 
